@@ -29,6 +29,9 @@ jobs:
       - name: Run two-node demo
         run: node examples/two-node-conformance-demo.mjs
 
+      - name: Run A2A authority evidence demo
+        run: node examples/a2a-authority-evidence-demo.mjs
+
       - name: Run governed-learning demo
         run: node sentient-reference/demo_candidate.mjs
 
@@ -54,13 +57,17 @@ jobs:
           test -f SECURITY.md
           test -f spec/OIAGP_CORE_SPEC.md
           test -f spec/TRANSPORT_PROFILE_HTTP.md
+          test -f spec/OIAGP_A2A_CONFORMANCE_PROFILE.md
           test -f conformance/CONFORMANCE_REQUIREMENTS.md
+          test -f conformance/a2a-governance-profile.test.mjs
           test -f reference/authority_evaluator.mjs
           test -f reference/reentry_evaluator.mjs
           test -f reference/mutation_integrity.mjs
           test -f reference/untrusted_execution_profile.mjs
           test -f reference/interoperability_adapters.mjs
+          test -f reference/a2a_governance_profile.mjs
           test -f examples/two-node-conformance-demo.mjs
+          test -f examples/a2a-authority-evidence-demo.mjs
           test -f sentient-reference/local_agent_shell.mjs
           test -f sentient-reference/controlled_learning.mjs
           test -f sentient-reference/evoskill_adapter.mjs
