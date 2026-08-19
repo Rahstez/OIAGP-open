@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.oiagp.example/v0.1/schemas/resource.schema.json",
+  "title": "OIAGP Resource",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resource_id", "institution_id", "tenant_id", "resource_type", "classification"],
+  "properties": {
+    "resource_id": {"$ref": "common.schema.json#/$defs/identifier"},
+    "institution_id": {"$ref": "common.schema.json#/$defs/identifier"},
+    "tenant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+    "resource_type": {"type": "string", "minLength": 1, "maxLength": 128},
+    "classification": {"type": "string", "minLength": 1, "maxLength": 128},
+    "owner_principal_id": {"$ref": "common.schema.json#/$defs/identifier"},
+    "attributes": {"type": "object", "maxProperties": 100}
+  }
+}
