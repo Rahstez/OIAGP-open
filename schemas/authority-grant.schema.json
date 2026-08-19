@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.oiagp.example/v0.1/schemas/authority-grant.schema.json",
+  "title": "OIAGP Authority Grant",
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/envelope"},
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oiagp_version", "message_type", "message_id", "issued_at", "grant_id", "issuer", "subject", "tenant_id", "capability", "operations", "resources", "effective_at", "expires_at", "delegation", "revocation_ref", "proof"],
+      "properties": {
+        "oiagp_version": {"$ref": "common.schema.json#/$defs/version"},
+        "message_type": {"const": "authority_grant"},
+        "message_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issued_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "correlation_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "extensions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/extension"}},
+        "grant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issuer": {"$ref": "common.schema.json#/$defs/identifier"},
+        "subject": {"$ref": "common.schema.json#/$defs/identifier"},
+        "tenant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "capability": {"$ref": "common.schema.json#/$defs/identifier"},
+        "operations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "common.schema.json#/$defs/identifier"}},
+        "resources": {"type": "array", "minItems": 1, "items": {"$ref": "common.schema.json#/$defs/resource_scope"}},
+        "purpose": {"type": "string", "maxLength": 1024},
+        "data_classifications": {"type": "array", "uniqueItems": true, "items": {"type": "string", "maxLength": 128}},
+        "effective_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "expires_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "approval_class": {"type": "string", "maxLength": 128},
+        "delegation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allowed", "remaining_depth"],
+          "properties": {
+            "allowed": {"type": "boolean"},
+            "remaining_depth": {"type": "integer", "minimum": 0, "maximum": 16},
+            "parent_grant_id": {"$ref": "common.schema.json#/$defs/identifier"}
+          }
+        },
+        "revocation_ref": {"type": "string", "format": "uri"},
+        "proof": {"$ref": "common.schema.json#/$defs/proof"}
+      }
+    }
+  ]
+}
