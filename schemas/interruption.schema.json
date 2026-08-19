@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.oiagp.example/v0.1/schemas/interruption.schema.json",
+  "title": "OIAGP Interruption",
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/envelope"},
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oiagp_version", "message_type", "message_id", "issued_at", "interruption_id", "request_id", "tenant_id", "issuer", "reason_code", "scope", "proof"],
+      "properties": {
+        "oiagp_version": {"$ref": "common.schema.json#/$defs/version"},
+        "message_type": {"const": "interruption"},
+        "message_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issued_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "correlation_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "extensions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/extension"}},
+        "interruption_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "request_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "tenant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issuer": {"$ref": "common.schema.json#/$defs/identifier"},
+        "reason_code": {"type": "string", "minLength": 1, "maxLength": 128},
+        "scope": {"enum": ["request", "execution", "capability", "subject", "tenant"]},
+        "proof": {"$ref": "common.schema.json#/$defs/proof"}
+      }
+    }
+  ]
+}
