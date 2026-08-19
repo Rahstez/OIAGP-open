@@ -1,0 +1,69 @@
+name: OIAGP Public Conformance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run OIAGP conformance tests
+        run: node --test conformance/*.test.mjs
+
+      - name: Run Sentient reference product tests
+        run: node --test sentient-reference/*.test.mjs
+
+      - name: Run two-node demo
+        run: node examples/two-node-conformance-demo.mjs
+
+      - name: Run governed-learning demo
+        run: node sentient-reference/demo_candidate.mjs
+
+      - name: Validate JSON schemas parse
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          files = sorted(Path('schemas').rglob('*.json'))
+          if not files:
+              raise SystemExit('no schemas found')
+          for path in files:
+              with path.open('r', encoding='utf-8') as handle:
+                  json.load(handle)
+              print(f'JSON OK: {path}')
+          PY
+
+      - name: Verify public candidate artifacts
+        run: |
+          test -f LICENSE
+          test -f NOTICE
+          test -f THIRD_PARTY_NOTICES.md
+          test -f SECURITY.md
+          test -f spec/OIAGP_CORE_SPEC.md
+          test -f spec/TRANSPORT_PROFILE_HTTP.md
+          test -f conformance/CONFORMANCE_REQUIREMENTS.md
+          test -f reference/authority_evaluator.mjs
+          test -f reference/reentry_evaluator.mjs
+          test -f reference/mutation_integrity.mjs
+          test -f reference/untrusted_execution_profile.mjs
+          test -f reference/interoperability_adapters.mjs
+          test -f examples/two-node-conformance-demo.mjs
+          test -f sentient-reference/local_agent_shell.mjs
+          test -f sentient-reference/controlled_learning.mjs
+          test -f sentient-reference/evoskill_adapter.mjs
+          test -f sentient-reference/adversarial_evaluation.mjs
+          test -f sentient-reference/demo_candidate.mjs
+          test -f sentient-reference/DEMO.md
