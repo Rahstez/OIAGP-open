@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.oiagp.example/v0.1/schemas/evidence-receipt.schema.json",
+  "title": "OIAGP Evidence Receipt",
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/envelope"},
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oiagp_version", "message_type", "message_id", "issued_at", "receipt_id", "request_id", "decision_id", "tenant_id", "executor", "operation", "outcome", "effect_classification", "content_hashes", "proof"],
+      "properties": {
+        "oiagp_version": {"$ref": "common.schema.json#/$defs/version"},
+        "message_type": {"const": "evidence_receipt"},
+        "message_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issued_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "correlation_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "extensions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/extension"}},
+        "receipt_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "request_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "decision_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "tenant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "executor": {"$ref": "common.schema.json#/$defs/identifier"},
+        "operation": {"$ref": "common.schema.json#/$defs/identifier"},
+        "outcome": {"enum": ["succeeded", "failed", "interrupted", "indeterminate"]},
+        "effect_classification": {"enum": ["no_effect", "committed_effect", "partial_effect", "indeterminate"]},
+        "content_hashes": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "minLength": 16, "maxLength": 512}},
+        "protected_evidence_refs": {"type": "array", "items": {"type": "string", "format": "uri"}},
+        "proof": {"$ref": "common.schema.json#/$defs/proof"}
+      }
+    }
+  ]
+}
