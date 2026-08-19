@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.oiagp.example/v0.1/schemas/execution-result.schema.json",
+  "title": "OIAGP Execution Result",
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/envelope"},
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oiagp_version", "message_type", "message_id", "issued_at", "request_id", "decision_id", "tenant_id", "executor", "status", "effect_classification", "started_at", "completed_at"],
+      "properties": {
+        "oiagp_version": {"$ref": "common.schema.json#/$defs/version"},
+        "message_type": {"const": "execution_result"},
+        "message_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issued_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "correlation_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "extensions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/extension"}},
+        "request_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "decision_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "tenant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "executor": {"$ref": "common.schema.json#/$defs/identifier"},
+        "status": {"enum": ["succeeded", "failed", "interrupted", "indeterminate"]},
+        "effect_classification": {"enum": ["no_effect", "committed_effect", "partial_effect", "indeterminate"]},
+        "started_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "completed_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "output": {},
+        "protected_output_ref": {"type": "string", "format": "uri"},
+        "error_code": {"type": "string", "maxLength": 128},
+        "receipt_id": {"$ref": "common.schema.json#/$defs/identifier"}
+      },
+      "not": {"required": ["output", "protected_output_ref"]}
+    }
+  ]
+}
