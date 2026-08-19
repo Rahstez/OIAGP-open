@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.oiagp.example/v0.1/schemas/task-request.schema.json",
+  "title": "OIAGP Task Request",
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/envelope"},
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oiagp_version", "message_type", "message_id", "issued_at", "request_id", "tenant_id", "requester", "capability", "operation", "resources", "authority_grant_id", "nonce", "evidence_requirements"],
+      "properties": {
+        "oiagp_version": {"$ref": "common.schema.json#/$defs/version"},
+        "message_type": {"const": "task_request"},
+        "message_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issued_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "correlation_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "extensions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/extension"}},
+        "request_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "tenant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "requester": {"$ref": "common.schema.json#/$defs/identifier"},
+        "capability": {"$ref": "common.schema.json#/$defs/identifier"},
+        "operation": {"$ref": "common.schema.json#/$defs/identifier"},
+        "resources": {"type": "array", "minItems": 1, "items": {"$ref": "common.schema.json#/$defs/resource_scope"}},
+        "input": {},
+        "protected_input_ref": {"type": "string", "format": "uri"},
+        "authority_grant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "approval_ref": {"$ref": "common.schema.json#/$defs/identifier"},
+        "nonce": {"type": "string", "minLength": 16, "maxLength": 512},
+        "idempotency_key": {"type": "string", "minLength": 16, "maxLength": 256},
+        "deadline": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "evidence_requirements": {"type": "object", "additionalProperties": false, "required": ["receipt_required"], "properties": {"receipt_required": {"type": "boolean"}, "pre_effect_required": {"type": "boolean"}, "content_hash_required": {"type": "boolean"}}},
+        "interruption_required": {"type": "boolean"}
+      },
+      "not": {"required": ["input", "protected_input_ref"]}
+    }
+  ]
+}
