@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.oiagp.example/v0.1/schemas/revocation.schema.json",
+  "title": "OIAGP Revocation",
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/envelope"},
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oiagp_version", "message_type", "message_id", "issued_at", "revocation_id", "issuer", "tenant_id", "target_type", "target_id", "effective_at", "reason_code", "proof"],
+      "properties": {
+        "oiagp_version": {"$ref": "common.schema.json#/$defs/version"},
+        "message_type": {"const": "revocation"},
+        "message_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issued_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "correlation_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "extensions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/extension"}},
+        "revocation_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issuer": {"$ref": "common.schema.json#/$defs/identifier"},
+        "tenant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "target_type": {"enum": ["grant", "subject", "capability", "tenant_binding", "key", "session", "delegation_chain"]},
+        "target_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "effective_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "reason_code": {"type": "string", "minLength": 1, "maxLength": 128},
+        "proof": {"$ref": "common.schema.json#/$defs/proof"}
+      }
+    }
+  ]
+}
