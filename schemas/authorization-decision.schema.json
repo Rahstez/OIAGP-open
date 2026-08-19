@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.oiagp.example/v0.1/schemas/authorization-decision.schema.json",
+  "title": "OIAGP Authorization Decision",
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/envelope"},
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oiagp_version", "message_type", "message_id", "issued_at", "decision_id", "request_id", "tenant_id", "decision", "policy_version", "expires_at"],
+      "properties": {
+        "oiagp_version": {"$ref": "common.schema.json#/$defs/version"},
+        "message_type": {"const": "authorization_decision"},
+        "message_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "issued_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "correlation_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "extensions": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/extension"}},
+        "decision_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "request_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "tenant_id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "decision": {"enum": ["allow", "deny", "challenge", "defer"]},
+        "reason_code": {"type": "string", "maxLength": 128},
+        "authorized_operation": {"$ref": "common.schema.json#/$defs/identifier"},
+        "authorized_resources": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/resource_scope"}},
+        "limits": {"type": "object", "maxProperties": 100},
+        "approval_evidence_ref": {"$ref": "common.schema.json#/$defs/identifier"},
+        "policy_version": {"type": "string", "minLength": 1, "maxLength": 128},
+        "expires_at": {"$ref": "common.schema.json#/$defs/timestamp"},
+        "proof": {"$ref": "common.schema.json#/$defs/proof"}
+      },
+      "allOf": [
+        {"if": {"properties": {"decision": {"const": "allow"}}}, "then": {"required": ["authorized_operation", "authorized_resources", "proof"]}},
+        {"if": {"properties": {"decision": {"const": "deny"}}}, "then": {"required": ["reason_code"]}}
+      ]
+    }
+  ]
+}
