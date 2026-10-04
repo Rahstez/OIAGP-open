@@ -35,7 +35,7 @@ test("principal authorization activates exact version only", () => {
   validateLearningCandidate(c, { tests_passed: true, adversarial_checks_passed: true, authority_boundary_preserved: true });
   requestActivation(c);
   assert.throws(() => authorizeActivation(c, { decision: "allow", principal_id: "user-1", capability_id: "skill-summarize", version: "9.9.9" }));
-  const active = authorizeActivation(c, { decision: "allow", principal_id: "user-1", capability_id: "skill-summarize", version: "0.1.0" });
+  const active = authorizeActivation(c, { decision: "allow", principal_id: "user-1", capability_id: "skill-summarize", version: "0.1.0" }, { verifyActivation: () => true });
   assert.equal(c.status, LearningStatus.ACTIVE);
   assert.equal(active.activation_authorized, true);
 });

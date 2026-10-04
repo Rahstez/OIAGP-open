@@ -43,7 +43,7 @@ const capability = authorizeActivation(candidate, {
   version: "0.1.0",
   principal_id: "user-demo",
   authority_ref: "grant-demo",
-});
+}, { verifyActivation: (request) => request.principalId === "user-demo" && request.capabilityId === "skill.demo.drafting" && request.version === "0.1.0" && request.authorization.authority_ref === "grant-demo" }); // Synthetic host fixture only; not a live proof verifier.
 activateCapability(agent, capability);
 
 const baseAuthority = {
