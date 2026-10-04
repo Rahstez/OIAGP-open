@@ -1,3 +1,4 @@
+import { consumeVerifiedActivation } from "./controlled_learning.mjs";
 import { evaluateReentry, mayResumeAuthorizedWork } from "../reference/reentry_evaluator.mjs";
 
 export const LocalAgentState = Object.freeze({ READY: "ready", REANCHOR_REQUIRED: "reanchor_required", PRINCIPAL_REQUIRED: "principal_required", DENIED: "denied" });
@@ -28,6 +29,10 @@ export function activateCapability(state, capability) {
   if (capability.validation_status !== "passed") throw new Error("capability validation not passed");
   if (capability.activation_authorized !== true) throw new Error("capability activation not authorized");
   if (state.revoked_capabilities.has(capability.id)) throw new Error("capability revoked");
+  const principalId = state.principal.principal_id;
+  if (!consumeVerifiedActivation(capability, principalId)) throw new Error("capability activation authority unverified");
+  if (state.status !== LocalAgentState.READY || state.principal.principal_id !== principalId ||
+      state.revoked_capabilities.has(capability.id)) throw new Error("activation state changed during verification");
   state.active_capabilities.add(`${capability.id}@${capability.version}`);
   state.evidence.push(Object.freeze({ type: "capability_activated", capability_id: capability.id, version: capability.version, at: new Date().toISOString() }));
   return true;

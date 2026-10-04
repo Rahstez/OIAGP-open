@@ -27,13 +27,64 @@ export function requestActivation(candidate) {
   return candidate.status;
 }
 
-export function authorizeActivation(candidate, authorization) {
+const verifiedActivations = new WeakMap();
+
+function freezeDetached(value, seen = new Set()) {
+  if (!value || typeof value !== "object" || seen.has(value)) return value;
+  seen.add(value);
+  for (const child of Object.values(value)) freezeDetached(child, seen);
+  return Object.freeze(value);
+}
+
+function verifyWithHost(verifier, context) {
+  if (typeof verifier !== "function") return false;
+  try {
+    const result = verifier(freezeDetached(structuredClone(context)));
+    if (result instanceof Promise) result.catch(() => {});
+    return result === true;
+  } catch { return false; }
+}
+
+// Host dependency, never populated from model output or request JSON. The
+// verifier resolves principal, exact capability/version, validation provenance,
+// expiry, revocation and replay policy. It is called again at final consumption.
+export function authorizeActivation(candidate, authorization, dependencies = {}) {
   if (candidate.status !== LearningStatus.ACTIVATION_PENDING) throw new Error("activation not pending");
   if (authorization?.decision !== "allow") throw new Error("activation denied");
   if (!authorization.principal_id) throw new Error("principal authorization required");
   if (authorization.capability_id !== candidate.capability_id) throw new Error("capability mismatch");
   if (authorization.version !== candidate.version) throw new Error("version mismatch");
+  const verifier = dependencies?.verifyActivation;
+  let context;
+  try {
+    context = freezeDetached(structuredClone({ principalId: authorization.principal_id,
+      capabilityId: candidate.capability_id, version: candidate.version,
+      candidate: { artifact: candidate.artifact, provenance: candidate.provenance, evaluation: candidate.evaluation }, authorization }));
+  } catch { throw new Error("activation evidence invalid"); }
+  if (!verifyWithHost(verifier, { ...context, stage: "issue" })) throw new Error("activation authority unverified");
+  if (candidate.status !== LearningStatus.ACTIVATION_PENDING || candidate.capability_id !== context.capabilityId || candidate.version !== context.version) {
+    throw new Error("activation candidate changed during verification");
+  }
+  const active = freezeDetached({ id: context.capabilityId, version: context.version,
+    validation_status: "passed", activation_authorized: true,
+    provenance: context.candidate.provenance, artifact: context.candidate.artifact });
+  verifiedActivations.set(active, { context, verifier, checking: false });
   candidate.activation_authorized = true;
   candidate.status = LearningStatus.ACTIVE;
-  return Object.freeze({ id: candidate.capability_id, version: candidate.version, validation_status: "passed", activation_authorized: true, provenance: candidate.provenance, artifact: candidate.artifact });
+  return active;
+}
+
+
+// An in-process opaque receipt is consumed once; serialized copies and
+// caller-created activation_authorized flags are not activation receipts.
+export function consumeVerifiedActivation(capability, principalId) {
+  const proof = verifiedActivations.get(capability);
+  if (!proof || proof.checking || proof.context.principalId !== principalId) return false;
+  proof.checking = true;
+  if (!verifyWithHost(proof.verifier, { ...proof.context, stage: "consume" })) {
+    proof.checking = false;
+    return false;
+  }
+  verifiedActivations.delete(capability);
+  return true;
 }
