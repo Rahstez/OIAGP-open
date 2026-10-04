@@ -107,3 +107,15 @@ test("host verifier reentry cannot consume the same receipt twice", () => {
   assert.equal(activateCapability(state, receipt), true);
   assert.equal(state.evidence.filter(e => e.type === "capability_activated").length, 1);
 });
+
+
+test("host callback cannot activate after revocation or principal/state replacement", () => {
+  for (const mutate of [state => revokeCapability(state, "skill.summarize"),
+    state => { state.status = LocalAgentState.REANCHOR_REQUIRED; },
+    state => { state.principal = createLocalPrincipal({ principal_id: "other", device_id: "other" }); }]) {
+    const state = shell(); runTakeGate(state, alignedReentry());
+    const receipt = approvedCapability(request => { if (request.stage === "consume") mutate(state); return true; });
+    assert.throws(() => activateCapability(state, receipt), /state changed/);
+    assert.equal(state.active_capabilities.size, 0);
+  }
+});
